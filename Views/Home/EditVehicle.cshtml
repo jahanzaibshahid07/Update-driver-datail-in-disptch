@@ -1,0 +1,766 @@
+﻿@model ViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Edit Vehicle </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <style>
+        ul, #myUL {
+            list-style-type: none;
+        }
+
+        #myUL {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box {
+            cursor: pointer;
+            -webkit-user-select: none; /* Safari 3.1+ */
+            -moz-user-select: none; /* Firefox 2+ */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none;
+        }
+
+            .box::before {
+                content: "\2610";
+                color: black;
+                display: inline-block;
+                margin-right: 6px;
+            }
+
+        .check-box::before {
+            content: "\2611";
+            color: dodgerblue;
+        }
+
+        .nested {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+         #AddressSection, #vehiclesnapshot{
+            border: 1px solid gray;
+            padding: 0px 5px 0px 5px;
+        }
+
+        .nested {
+            min-height: 615px;
+            max-height: 615px;
+            margin-bottom: 10px;
+            overflow: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        label, .col-form-label, .custom-control-label {
+            font-size: 13px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="">
+        <div class="row">
+
+            <div class="col-sm-2">
+                <ul id="myUL">
+                    <li>
+                        <span class="box" style="margin-left:3px">Vehicle</span>
+                        <ul class="nested">
+                            @foreach (var item in Model.Vehicle.OrderBy(i => i.reg).ToList())
+                            {
+                                <li><button id="@item.reg" onclick="showdetails(this.id)" type="button" style="width: 85px; height: 27px;">@item.reg</button></li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+
+            <div class="col-sm-4 mt-2">
+                <p>if owner is driver already exist<br />then choose from dropdown list</p>
+                <div class="form-row">
+                    <select id="driver" class="form-control form-control-sm">
+                        <option></option>
+                        @foreach (var item in Model.Vehicle.OrderBy(i => i.drv_name).ToList())
+                        {
+
+                            <option>@item.drv_name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-row mt-1">
+                    <label class=" col-form-label col-form-label-sm">Vehicle Type</label>
+                    <select id="vehicletype" class="form-control form-control-sm " disabled>
+                        <option></option>
+                        @foreach (var item in Model.Vehicle)
+                        {
+                            
+                            <option>@item.veh_type</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group mt-2">
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="isactive">
+                        <label class="custom-control-label" for="isactive">Is Active</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="isshared">
+                        <label class="custom-control-label" for="isshared">Is Shared</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="ishidden">
+                        <label class="custom-control-label" for="ishidden">Is Hidden</label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-sm-6 mb-0 mt-2">
+                        <label class=" col-form-label col-form-label-sm">Make</label>
+                        <input type="text" id="make" class="form-control form-control-sm" placeholder="">
+                    </div>
+
+                    <div class="form-group col-sm-6 mb-0 mt-2">
+                        <label class=" col-form-label col-form-label-sm">Model</label>
+                        <input type="text" id="model" class="form-control form-control-sm" placeholder="">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-sm-6">
+                        <label for="dateofbirth" class="col-form-label col-form-label-sm">M.O.T Expiry</label>
+                        <input id="motexpiry" class="form-control form-control-sm" type="date">
+                    </div>
+
+                    <div class="form-group col-sm-6">
+                        <label for="dateofbirth" class="col-form-label col-form-label-sm">Insurance Expiry</label>
+                        <input id="insuranceexpiry" class="form-control form-control-sm" type="date">
+                    </div>
+                </div>
+
+                <div id="vehiclesnapshot">
+                    <label>Vehicle Snapshot</label>
+                    <div class="form-row mt-1">
+                        <img src="" style="width:340px; height:190px;" alt="..." class="img-thumbnail">
+                    </div>
+                </div>
+
+                <div class="form-row mt-4">
+                    <div class="form-group col-sm-6 mt-1">
+                        <label class=" col-form-label col-form-label-sm">SIM</label>
+                        <input type="text" id="sim" class="form-control form-control-sm" placeholder="">
+                    </div>
+
+                    <div class="form-group col-sm-6 mt-1">
+                        <label class=" col-form-label col-form-label-sm">IMEI</label>
+                        <input type="text" id="imei" class="form-control form-control-sm" placeholder="">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-sm-6 mt-0">
+
+                <div class="form-row  mb-1 col-8">
+                    <label class="col-sm-2 col-form-label col-form-label-sm">Owner's Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="ownername" class="form-control form-control-sm" placeholder="" disabled>
+                    </div>
+                </div>
+
+                <div id="AddressSection">
+                    <h6>Owner's Address:</h6>
+                    <div class="form-group row mt-0 mb-1">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">Street 1</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="street1a" class="form-control form-control-sm" placeholder="">
+                        </div>
+                        <div class="col-sm-7">
+                            <input type="text" id="street1b" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-1">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">Street 2</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="street2" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-1">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">Town</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="town" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-1">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">County</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="county" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">PostCode</label>
+                        <div class="col-sm-6">
+                            <input type="text" id="postcode" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-row mt-0">
+                    <div class="form-group col-sm-4 mb-0 mt-1">
+                        <label class=" col-form-label col-form-label-sm">Body style</label>
+                        <input type="text" id="bodystyle" class="form-control form-control-sm" placeholder="">
+                    </div>
+
+                    <div class="form-group col-sm-4 mb-0 mt-1">
+                        <label class=" col-form-label col-form-label-sm">Colour</label>
+                        <input type="text" id="colour" class="form-control form-control-sm" placeholder="">
+                    </div>
+
+                    <div class="form-group col-sm-4 mb-0 mt-1">
+                        <label class=" col-form-label col-form-label-sm">Registration</label>
+                        <input type="text" id="registration" class="form-control form-control-sm" placeholder="" disabled>
+                    </div>
+                </div>
+
+                <div class="form-row mt-0">
+                    <div class="form-group col-sm-4">
+                        <label for="dateofbirth" class="col-form-label col-form-label-sm">Road Tax Expiry</label>
+                        <input id="roadtaxexpiry" class="form-control form-control-sm" type="date">
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                        <label class=" col-form-label col-form-label-sm">PCO Vehicle LIC</label>
+                        <input type="text" id="pcovehiclelic" class="form-control form-control-sm" placeholder="" disabled>
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                        <label for="dateofbirth" class="col-form-label col-form-label-sm">PCO Expiry</label>
+                        <input id="pcoexpiry" class="form-control form-control-sm" type="date">
+                    </div>
+                </div>
+
+                @*image section*@
+                <div class="form-row mt-1">
+                    <div class="col-3">
+                        <label>Vehicle Snapshot:</label>
+                    </div>
+                    <div class="custom-file col-9">
+                        <input type="file" class="custom-file-input" id="img1">
+                        <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                    </div>
+                </div>
+
+                <div class="form-row mt-1">
+                    <div class="col-3">
+                        <label>Insurance Certificate:</label>
+                    </div>
+                    <div class="custom-file col-9">
+                        <input type="file" class="custom-file-input" id="img2">
+                        <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                    </div>
+                </div>
+
+                <div class="form-row mt-0">
+                    <div class="col-3">
+                        <label>Vehicle logbook:</label>
+                    </div>
+                    <div class="custom-file col-9">
+                        <input type="file" class="custom-file-input" id="img3">
+                        <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                    </div>
+                </div>
+
+                <div class="form-row mt-1">
+                    <div class="col-3">
+                        <label>Vehicle P.C.O:</label>
+                    </div>
+                    <div class="custom-file col-9">
+                        <input type="file" class="custom-file-input" id="img4">
+                        <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                    </div>
+                </div>
+
+                <div class="form-row mt-1">
+                    <div class="col-3">
+                        <label>MOT:</label>
+                    </div>
+                    <div class="custom-file col-9">
+                        <input type="file" class="custom-file-input" id="img5">
+                        <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                    </div>
+                </div>
+                @*image section*@
+
+            <div class="form-group mt-1 mb-0">
+                <button type="button" class="btn btn-warning btn-sm">View Documents</button>
+                <button type="button" class="btn btn-warning btn-sm" onclick="DownloadImages()">Download Documents</button>
+                <button type="button" class="btn btn-warning btn-sm" onclick="FTP_Upload_pics()">Upload Documents</button>
+            </div>
+
+                <div class="form-row mt-1">
+                    <div class="form-group col-sm-4">
+                        <label class=" col-form-label col-form-label-sm">Make and Model</label>
+                        <input type="text" id="makeandmodel" class="form-control form-control-sm" placeholder="">
+                    </div>
+                    <div class="form-group col-sm-8 mt-4">
+                        <button type="button" class="btn btn-warning btn-sm" onclick="Savedata()">Save Vehicle</button>
+                        <button type="button" class="btn btn-warning btn-sm">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function DownloadImages()
+        {
+            let obj1 = new Object();
+            obj1.reg = $("#registration").val();
+
+            debugger
+            if (obj1.reg == "" || obj1.reg == undefined || obj1.reg == null) {
+
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'please select vehicle',
+                    text: '',
+                  })
+
+            }
+            else {
+
+                let timerInterval
+                Swal.fire({
+                    title: 'Pictures downloading',
+                    html: 'I will close in <b></b> milliseconds.',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    onBeforeOpen: () => {
+                        Swal.showLoading()
+                        timerInterval = setInterval(() => {
+                            Swal.getContent().querySelector('b')
+                                .textContent = Swal.getTimerLeft()
+                        }, 3000)
+                    },
+                    onClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.timer
+                    ) {
+                        console.log('I was closed by the timer') // eslint-disable-line
+                    }
+                })
+
+
+                $.ajax({
+                    url: '@Url.Action("DownloadVehicleImage","Home")',
+                    type: 'POST',
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({
+                        obj: obj1
+                    }),
+                    success: function (data) {
+                        debugger
+                        if (data.success) {
+                            debugger
+                            Swal.fire({
+                                position: 'top-end',
+                                type: 'success',
+                                title: data.message,
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                timer: 2000
+                            });
+                        }
+                        else
+                        {
+                            debugger
+                                Swal.fire({
+                                position: 'center',
+                                type: 'warning',
+                                title: data.message,
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                timer: 2000
+                            });
+                        }
+                    }
+                });
+            }
+
+        }
+
+
+        function FTP_Upload_pics()
+        {
+
+            var data = new FormData();
+
+            
+
+            var file1 = $("#img1").get(0).files;
+            var file2 = $("#img2").get(0).files;
+            var file3 = $("#img3").get(0).files;
+            var file4 = $("#img4").get(0).files;
+            var file5 = $("#img5").get(0).files;
+
+            if (file1.length == 0 && file2.length == 0 && file3.length == 0 && file4.length == 0 && file5.length == 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'please choose file',
+                    text: '',
+                })
+            }
+            else {
+
+
+                debugger
+
+                if (file1.length > 0) {
+                    data.append("HelpSectionImages1", file1[0]);
+                }
+                if (file2.length > 0) {
+                    data.append("HelpSectionImages2", file2[0]);
+                }
+                if (file3.length > 0) {
+                    data.append("HelpSectionImages3", file3[0]);
+                }
+                if (file4.length > 0) {
+                    data.append("HelpSectionImages4", file4[0]);
+                }
+                if (file5.length > 0) {
+                    data.append("HelpSectionImages5", file5[0]);
+                }
+
+
+                var reg = $('#registration').val();
+                data.append("reg", reg);
+
+
+                let timerInterval
+                Swal.fire({
+                    title: 'Pictures uploading',
+                    html: 'I will close in <b></b> milliseconds.',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    onBeforeOpen: () => {
+                        Swal.showLoading()
+                        timerInterval = setInterval(() => {
+                            Swal.getContent().querySelector('b')
+                                .textContent = Swal.getTimerLeft()
+                        }, 3000)
+                    },
+                    onClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.timer
+                    ) {
+                        console.log('I was closed by the timer') // eslint-disable-line
+                    }
+                })
+
+
+                $.ajax({
+                    url: '@Url.Action("UploadVehicleImage", "Home")',
+                    type: "POST",
+                    processData: false,
+                    contentType: false, //"application/json; charset=utf-8",
+                    data: data,
+                    success: function (data) {
+                        debugger
+                        if (data.success) {
+
+                            $(document).ready(function () {
+
+                            setTimeout(function () {
+
+                                Swal.fire({
+                                position: 'top-end',
+                                type: 'success',
+                                title: data.message,
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                timer: 2000
+                                });
+
+                            }, 1000);
+
+                          });
+                       
+
+                        } else
+                        {
+                          debugger
+                            $(document).ready(function () {
+
+                            setTimeout(function () {
+
+                                 Swal.fire({
+                                position: 'center',
+                                type: 'warning',
+                                title: data.message,
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                timer: 2000
+                                });
+
+                            }, 1000);
+
+                            });
+
+                        }
+                    }
+
+                });
+
+
+            }
+        }
+
+        function Savedata()
+        {
+              var obj = new Object();
+              obj.drv_name = $("#driver").val();
+              obj.veh_make = $("#make").val();
+              obj.veh_model = $("#model").val();
+              obj.owner_name = $("#ownername").val();        
+              obj.steet1a = $("#street1a").val();
+              obj.steet1b = $("#street1b").val();
+              obj.steet2 = $("#street2").val();
+              obj.town = $("#town").val();
+              obj.county = $("#county").val();
+              obj.postcode = $("#postcode").val();
+              obj.body_style = $("#bodystyle").val();
+              obj.colour = $("#colour").val();
+              obj.reg = $("#registration").val();
+              obj.veh_type = $("#vehicletype").val();
+              obj.plateid = $("#pcovehiclelic").val();
+
+              
+              obj.is_active = $("#isactive").prop('checked');
+              obj.is_hide = $("#ishidden").prop('checked');
+              obj.shared = $("#isshared").prop('checked');
+
+
+              let mot = $("#motexpiry").val();
+              obj.mot_exp = parseFloat((new Date(mot).getTime() / 1000));
+
+              let ins = $("#insuranceexpiry").val();
+              obj.ins_exp = parseFloat((new Date(ins).getTime() / 1000));
+
+              let road = $("#roadtaxexpiry").val();
+              obj.road_tax_exp = parseFloat((new Date(road).getTime() / 1000));
+
+              let plate = $("#pcoexpiry").val();
+              obj.plateexp = parseFloat((new Date(plate).getTime() / 1000));
+
+              debugger
+
+                $.ajax({
+                url: '@Url.Action("UpdateVehicleData","Home")',
+                type: 'POST',
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    obj1: obj
+                }),
+                success: function (data) {
+                    if (data.success == true) {
+                        Swal.fire({
+                          position: 'top-end',
+                          icon: 'success',
+                          title: 'Your work has been saved',
+                          showConfirmButton: false,
+                          timer: 1500
+                        })
+
+                        setTimeout(function ()
+                        {
+                            window.location.reload();
+                        },2000);
+
+                    } else {
+                        alert("error");
+
+                    }
+                }
+            });
+
+
+        }
+
+        function showdetails(idd)
+        {
+     
+
+            debugger
+
+            $.ajax({
+                url: '@Url.Action("EditVehicle","Home")',
+                type: 'POST',
+                //dataType: "json",
+                //contentType: 'application/json; charset=utf-8',
+                data: {
+                    idd: idd
+                },
+                success: function (data) {
+                    debugger
+                    if (data.success == true)
+                    {
+                        function ConvertDate(ts)
+                        {
+
+                            // convert unix timestamp to milliseconds
+                            let ts_ms = ts * 1000;
+
+                            // initialize new Date object
+                             let date_ob = new Date(ts_ms);
+
+                            // year as 4 digits (YYYY)
+                            let year = date_ob.getFullYear();
+
+                            // month as 2 digits (MM)
+                            let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+
+                            // date as 2 digits (DD)
+                            let date = ("0" + date_ob.getDate()).slice(-2);
+
+                            return (year + "-" + month + "-" + date);
+                        }
+
+                        debugger
+
+                        $("#sim").val();
+                        $("#imei").val();
+
+                        $("#driver").val(data.obj.drv_name);
+                        $("#make").val(data.obj.veh_make);
+                        $("#model").val(data.obj.veh_model);
+                        $("#ownername").val(data.obj.owner_name);
+                        $("#street1a").val(data.obj.steet1a);
+                        $("#street1b").val(data.obj.steet1b);
+                        $("#street2").val(data.obj.steet2);
+                        $("#town").val(data.obj.town);
+                        $("#county").val(data.obj.county);
+                        $("#postcode").val(data.obj.postcode);
+                        $("#bodystyle").val(data.obj.body_style);
+                        $("#colour").val(data.obj.colour);
+                        $("#registration").val(data.obj.reg);
+                        $("#vehicletype").val(data.obj.veh_type);
+                        $("#pcovehiclelic").val(data.obj.plateid);
+                   
+                        $("#makeandmodel").val(data.obj.veh_make +" "+ data.obj.veh_model)
+
+                        let mot = ConvertDate(data.obj.mot_exp);
+                        $("#motexpiry").val(mot);
+                        let ins = ConvertDate(data.obj.ins_exp);
+                        $("#insuranceexpiry").val(ins);
+                        let road = ConvertDate(data.obj.road_tax_exp);
+                        $("#roadtaxexpiry").val(road);
+                        let plate = ConvertDate(data.obj.plateexp);
+                        $("#pcoexpiry").val(plate);
+                        debugger
+
+                        switch (data.obj.is_active)
+                        {
+                            case true:
+                                $("#isactive").prop('checked', true);
+                                break;
+                            case false:
+                                $("#isactive").prop('checked', false);
+                                break;
+                            case null:
+                                $("#isactive").prop('checked', false);
+                                break;
+                        }
+                        switch (data.obj.is_hide)
+                        {
+                            case true:
+                                $("#ishidden").prop('checked', true);
+                                break;
+                            case false:
+                                $("#ishidden").prop('checked', false);
+                                break;
+                            case null:
+                                $("#ishidden").prop('checked', false);
+                                break;
+                        }
+                        switch (data.obj.shared)
+                        {
+                            case true:
+                                $("#isshared").prop('checked', true);
+                                break;
+                            case false:
+                                $("#isshared").prop('checked', false);
+                                break;
+                            case null:
+                                $("#isshared").prop('checked', false);
+                                break;
+                        }
+           
+                    }
+                 },
+                error: function () {
+                    alert("error");
+                }
+            });
+   
+        }
+
+
+    </script>
+
+
+    <script>
+
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+
+        var toggler = document.getElementsByClassName("box");
+        var i;
+
+        for (i = 0; i < toggler.length; i++) {
+            toggler[i].addEventListener("click", function () {
+                this.parentElement.querySelector(".nested").classList.toggle("active");
+                this.classList.toggle("check-box");
+            });
+        }
+
+    </script>
+
+</body>
+</html>

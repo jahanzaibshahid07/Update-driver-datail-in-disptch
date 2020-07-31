@@ -1,0 +1,997 @@
+﻿@model ViewModel
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Edit Driver </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+    <style>
+        ul, #myUL {
+            list-style-type: none;
+        }
+
+        #myUL {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box {
+            cursor: pointer;
+            -webkit-user-select: none; /* Safari 3.1+ */
+            -moz-user-select: none; /* Firefox 2+ */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none;
+        }
+
+            .box::before {
+                content: "\2610";
+                color: black;
+                display: inline-block;
+                margin-right: 6px;
+            }
+
+        .check-box::before {
+            content: "\2611";
+            color: dodgerblue;
+        }
+
+        .nested {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        #AddressSection, #Documents, #Weekdays, #DriverShift, #userdetail {
+            border: 1px solid gray;
+            padding: 0px 5px 0px 5px;
+        }
+
+        #DriverSection {
+            margin-top: 475px;
+        }
+
+        .nested {
+            min-height: 615px;
+            max-height: 615px;
+            margin-bottom: 10px;
+            overflow: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        label, .col-form-label, .custom-control-label {
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="">
+        <div class="row">
+
+            <div class="col-sm-2">
+                <ul id="myUL">
+                    <li>
+                        <span class="box" style="margin-left: 5px;">Drivers</span>
+                        <ul class="nested">
+                            @foreach (var item in Model.Driver.OrderBy(i => i.call_sign).ToList())
+                            {
+                                <li><button id="@item.call_sign" onclick="showdetails(this.id)" type="button" style="width: 45px; height: 27px;">@item.call_sign</button></li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-row">
+                    <div class="col-8">
+                        <label>Driver's Name</label>
+                        <input type="text" id="drivername" class="form-control form-control-sm" placeholder="" disabled>
+                    </div>
+                    <div class="col-4">
+                        <label>Callsign (Digits only)</label>
+                        <input type="number" id="callsign" pattern="[0-9]" class="form-control form-control-sm" placeholder="" disabled>
+                    </div>
+                </div>
+
+                <div class="form-group row mt-1 mb-0">
+                    <label class="col-sm-4 col-form-label col-form-label-sm mb-0">PDA PIN #(Digits only)</label>
+                    <div class="col-sm-3 mb-0">
+                        <input type="number" id="pdapin" pattern="[0-9]" class="form-control form-control-sm" placeholder="" disabled>
+                    </div>
+                    <label class="col-sm-2 col-form-label col-form-label-sm mb-0">Priority</label>
+                    <div class="col-sm-3 mb-1">
+                        <input type="number" id="priority" class="form-control form-control-sm" placeholder="" />
+                    </div>
+
+                </div>
+
+
+
+                <div class="form-row mt-0">
+                    <div class="form-row col-sm-7 mt-3">
+                        <label class="col-sm-6 col-form-label col-form-label-sm">Default Vehicle</label>
+                        <select id="defaultvehicle" class="form-control form-control-sm col-sm-6">
+                            <option></option>
+                            @foreach (var item in Model.Vehicle.OrderBy(i => i.reg).ToList())
+                            {
+                                <option>@item.reg</option>
+                            }
+                        </select>
+
+                    </div>
+                    <div class="col-sm-5 ml-2">
+                        <div class="form-group mb-1">
+                            <button type="button" class="btn btn-warning btn-sm" onclick="cleardefaultvehicle()">Clear Default Vehicle</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-warning btn-sm">Go To Vehicle</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-row">
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="active">
+                        <label class="custom-control-label" for="active">Active</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="allowset">
+                        <label class="custom-control-label" for="allowset">Allow Set Bid Radius</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="allowrevert">
+                        <label class="custom-control-label" for="allowrevert">Allow Revert Job</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="allowbidjob">
+                        <label class="custom-control-label" for="allowbidjob">Allow Bid Job</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="allowbidglobal">
+                        <label class="custom-control-label" for="allowbidglobal">Allow Bid Global</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="lockout">
+                        <label class="custom-control-label" for="lockout">lock Out Driver</label>
+                    </div>
+                </div>
+
+                <div class="form-row mt-1">
+                    <div class="custom-control custom-checkbox mr-3">
+                        <input type="checkbox" class="custom-control-input" id="allowfuture">
+                        <label class="custom-control-label" for="allowfuture">Allow Future Job</label>
+                    </div>
+                </div>
+
+                <div id="AddressSection">
+                    <h6>Address:</h6>
+                    <div class="form-group row mt-0 mb-1">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">Street 1</label>
+                        <div class="col-sm-3">
+                            <input type="text" id="street1a" class="form-control form-control-sm" placeholder="">
+                        </div>
+                        <div class="col-sm-7">
+                            <input type="text" id="street1b" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-1">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">Street 2</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="street2" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-1">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">Town</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="town" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-1">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">Country</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="country" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label col-form-label-sm">PostCode</label>
+                        <div class="col-sm-6">
+                            <input type="text" id="postcode" class="form-control form-control-sm" placeholder="">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-row mb-0">
+                    <div class="form-group col-md-6 mb-0">
+                        <label class="col-form-label col-form-label-sm">Home Telephone Number</label>
+                        <input type="text" id="hometele"  class="form-control form-control-sm" placeholder="">
+                    </div>
+                    <div class="form-group col-md-6 mb-0">
+                        <label class="col-form-label col-form-label-sm">Mobile Telephone Number</label>
+                        <input type="text" id="mobiletele" class="form-control form-control-sm" placeholder="" disabled>
+                    </div>
+                </div>
+
+                <div class="form-row mb-0">
+                    <div class="form-group col-md-6 mb-0">
+                        <label class="col-form-label col-form-label-sm">PCO Driver LIC</label>
+                        <input type="text" id="pco" class="form-control form-control-sm" placeholder="">
+                    </div>
+                    <div class="form-group col-md-6 mb-0">
+                        <label for="example-date-input" class="col-form-label col-form-label-sm">Expires</label>
+                        <input id="pcodriverlicexpires" class="form-control form-control-sm" type="date" value="">
+                    </div>
+                </div>
+
+                <div class="form-row mb-0">
+                    <div class="form-group col-md-6 mb-0">
+                        <label class="col-form-label col-form-label-sm">Driving Licence Number</label>
+                        <input id="Drivinglicence" type="text" class="form-control form-control-sm" placeholder="" disabled>
+                    </div>
+                    <div class="form-group col-md-6 mb-0">
+                        <label class="col-form-label col-form-label-sm">Expires</label>
+                        <input id="driverlicexpires" class="form-control form-control-sm" type="date" value="">
+                    </div>
+                </div>
+
+                <div class="form-row mt-1">
+                    <div class="col-sm-6 mt-0">
+                        <label for="dateofbirth" class="col-form-label col-form-label-sm">Date of birth</label>
+                        <input id="dateofbirth" class="form-control form-control-sm" type="date" value="">
+
+                        <label for="startdate" class="col-form-label col-form-label-sm">Start Date</label>
+                        <input id="startdate" class="form-control form-control-sm" type="date" value="">
+
+                        <label for="enddate" class="col-form-label col-form-label-sm">End Date</label>
+                        <input id="enddate" class="form-control form-control-sm" type="date" value="">
+                    </div>
+                    <div class="col-sm-6 mt-0">
+                        <div id="malefemale" class="ml-5">
+                            <label for="example-date-input" class="col-form-label col-form-label-sm">Sex</label>
+                            <div class="form-row">
+                                <div class="radio radio-info mr-3">
+                                    <input type="radio" name="survey" id="male" value="">
+                                    <label>
+                                        Male
+                                    </label>
+                                </div>
+                                <div class="radio radio-info">
+                                    <input type="radio" name="survey" id="female" value="">
+                                    <label>
+                                        Female
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label col-form-label-sm mb-1">Email</label>
+                            <input id="email" type="email" class="form-control form-control-sm" placeholder="">
+                            <label class="col-form-label col-form-label-sm">National Insurance Number</label>
+                            <input id="nationalinsurance" type="text" class="form-control form-control-sm" placeholder="" disabled>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+            <div class="col-sm-4">
+
+                <div id="DriverSection">
+
+                    <div id="Documents" class="form-row">
+                        <div class="form-row col-sm-6 mt-1 mb-1">
+                            @*<img src="@ViewBag.ImageData" style="width: 150px; height: 160px" />*@
+                        </div>
+                        <div class="col-sm-6 ml-2">
+                            <div class="form-group mb-1 mt-2">
+                                <button type="button" class="btn btn-warning btn-sm" onclick='window.location = "@Url.Action("UploadDriverImage", "Home")";' >Browse To Attach File</button>
+                            </div>
+                            <div class="form-group mt-0 mb-1">
+                                <button type="button" class="btn btn-warning btn-sm" onclick="DownloadDriverImages()">Download All<br /> Document</button>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-warning btn-sm">View Document</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="Weekdays" class="form-row mt-1">
+                        <div class="custom-control custom-checkbox mr-2">
+                            <input type="checkbox" class="custom-control-input" id="mon">
+                            <label class="custom-control-label" for="mon">M</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mr-2">
+                            <input type="checkbox" class="custom-control-input" id="tue">
+                            <label class="custom-control-label" for="tue">T</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mr-2">
+                            <input type="checkbox" class="custom-control-input" id="wed">
+                            <label class="custom-control-label" for="wed">W</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mr-2">
+                            <input type="checkbox" class="custom-control-input" id="thur">
+                            <label class="custom-control-label" for="thur">T</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mr-2">
+                            <input type="checkbox" class="custom-control-input" id="fri">
+                            <label class="custom-control-label" for="fri">F</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mr-2">
+                            <input type="checkbox" class="custom-control-input" id="sat">
+                            <label class="custom-control-label" for="sat">S</label>
+                        </div>
+                        <div class="custom-control custom-checkbox mr-3">
+                            <input type="checkbox" class="custom-control-input" id="sun">
+                            <label class="custom-control-label" for="sun">S</label>
+                        </div>
+
+                        <div class="custom-control custom-checkbox ">
+                            <input type="checkbox" class="custom-control-input" id="anyday">
+                            <label class="custom-control-label" for="anyday">Any day</label>
+                        </div>
+
+                    </div>
+
+                    <div id="DriverShift" class="form-row mt-1">
+                        <div class="col-6">
+                            <label for="startshift">Start Shift:</label> <input type="time" id="startshift" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-6">
+                            <label for="endshift">End Shift:</label> <input type="time" id="endshift" class="form-control form-control-sm">
+                        </div>
+                        <div class="custom-control custom-checkbox ">
+                            <input type="checkbox" class="custom-control-input" id="anytime">
+                            <label class="custom-control-label" for="anytime">Any Time</label>
+                        </div>
+                    </div>
+
+                    <div class="form-row mt-2">
+                        <div class="form-group mb-1 mr-3">
+                            <button type="button" class="btn btn-warning btn-sm" onclick="Savedata()">Save Driver</button>
+                        </div>
+                        <div class="form-group ">
+                            <button type="button" class="btn btn-warning btn-sm">Exit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+
+        function cleardefaultvehicle()
+        {
+            $('#defaultvehicle').val('');
+        }
+
+
+
+        function Savedata() {
+
+       
+            var obj = new Object();
+
+              obj.drv_Name = $("#drivername").val();
+              obj.call_sign = $("#callsign").val();
+              obj.pdaPin =  $("#pdapin").val();
+              obj.priority = $("#priority").val();
+              obj.DefaultVehicle = $("#defaultvehicle").val();
+              obj.is_active = $("#active").prop('checked');
+              obj.AllowBidRadius = $("#allowset").prop('checked');
+              obj.driverRevert = $("#allowrevert").prop('checked');
+              obj.driverBid = $("#allowbidjob").prop('checked');
+              obj.AllowBidGlobal = $("#allowbidglobal").prop('checked');
+              obj.AllowFutureJob = $("#allowfuture").prop('checked');
+              obj.lockout_drv_chk = $("#lockout").prop('checked');
+              obj.steet1a = $("#street1a").val();
+              obj.steet1b = $("#street1b").val();
+              obj.steet2 = $("#street2").val();
+              obj.town = $("#town").val();
+              obj.country = $("#country").val();
+              obj.postcode = $("#postcode").val();
+              obj.home_tele_num = $("#hometele").val();
+              obj.mob_tele_num = $("#mobiletele").val();
+              obj.drvlic_num = $("#Drivinglicence").val();
+              obj.taxi_badg_num = $("#pco").val();
+
+      
+
+              let badg1 = $("#pcodriverlicexpires").val();
+              obj.badg_exp = parseFloat((new Date(badg1).getTime() / 1000));
+              
+              let licnum1 = $("#driverlicexpires").val();
+              obj.lic_exp = parseFloat((new Date(licnum1).getTime() / 1000));
+             
+              let dob1 = $("#dateofbirth").val();
+              obj.dob = parseFloat((new Date(dob1).getTime() / 1000));
+              
+              let startdate1 = $("#startdate").val();
+              obj.start_date = parseFloat((new Date(startdate1).getTime() / 1000));
+
+              let enddate1 = $("#enddate").val();
+              obj.end_date = parseFloat((new Date(enddate1).getTime() / 1000));
+
+    
+             
+                if ($("#male").prop('checked')) 
+                {
+                    debugger
+                    obj.sex_chk = "Male";
+              
+                }
+                else if ($("#female").prop('checked'))
+                {
+                    debugger
+                   obj.sex_chk = "Female";
+                }
+
+             obj.nat_ins_num = $("#nationalinsurance").val();
+             obj.email = $("#email").val();
+
+
+            var today = new Date();
+            var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+            let shift1 = $("#startshift").val();
+            obj.shift_timestart = parseFloat((new Date(date+" "+shift1).getTime() / 1000));
+
+            let shift2 = $("#endshift").val();
+            obj.shift_timeend = parseFloat((new Date(date + " " + shift2).getTime() / 1000));
+            debugger
+
+            if($("#anytime").prop('checked'))
+            {
+                shift1 = "00:00";
+                obj.shift_timestart = parseFloat((new Date(date + " " + shift1).getTime() / 1000));
+                shift2 = "23:59";
+                obj.shift_timeend = parseFloat((new Date(date + " " + shift2).getTime() / 1000));
+                debugger
+            }
+
+            debugger
+            var weekdaysarray = new Array();
+
+            if($("#mon").prop('checked'))
+            {
+                weekdaysarray.push("Monday");
+            }
+            if($("#tue").prop('checked'))
+            {
+                weekdaysarray.push("Tuesday");
+            }
+            if($("#wed").prop('checked'))
+            {
+                weekdaysarray.push("Wednesday");
+            }
+            if($("#thur").prop('checked'))
+            {
+                weekdaysarray.push("Thursday");
+            }
+            if($("#fri").prop('checked'))
+            {
+                weekdaysarray.push("Friday");
+            }
+            if($("#sat").prop('checked'))
+            {
+                weekdaysarray.push("Saturday");
+            }
+            if($("#sun").prop('checked'))
+            {
+                weekdaysarray.push("Sunday");
+            }
+            obj.weekdays = weekdaysarray;
+   
+
+            if($("#anyday").prop('checked'))
+            {
+                var ar = new Array();
+                ar.push("Monday");
+                ar.push("Tuesday");
+                ar.push("Wednesday");
+                ar.push("Thursday");
+                ar.push("Friday");
+                ar.push("Saturday");
+                ar.push("Sunday");
+                obj.weekdays = ar;
+                debugger
+            }
+
+          debugger
+
+            $.ajax({
+                url: '@Url.Action("EditDriver","Home")',
+                type: 'POST',
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    obj1: obj
+                }),
+                success: function (data) {
+                    if (data.success == true) {
+                        Swal.fire({
+                          position: 'top-end',
+                          icon: 'success',
+                          title: 'Your work has been saved',
+                          showConfirmButton: false,
+                          timer: 1500
+                        })
+
+                        setTimeout(function ()
+                        {
+                            window.location.reload();
+                        },2000);
+
+                    } else {
+                        alert("error");
+
+                    }
+                }
+            });
+
+        }
+
+        function showdetails(idd) {
+
+
+            var driverdata;
+            debugger
+
+            $.ajax({
+                url: '@Url.Action("Index","Home")',
+                type: 'POST',
+                //dataType: "json",
+                 //contentType: 'application/json; charset=utf-8',
+                data: {
+                    idd: idd
+                },
+                success: function (data) {
+                    debugger
+                    if (data.success == true) {
+
+
+                       function ConvertTime(info)
+                        {
+                            var dt = new Date(info*1000);
+                            var hr =  "0"+ dt.getHours();
+                            var m = "0" + dt.getMinutes();
+                            //var s = "0" + dt.getSeconds();
+                            return hr.substr(-2) + ':' + m.substr(-2);
+                        }
+
+                        function ConvertDate(ts)
+                        {
+
+                            // convert unix timestamp to milliseconds
+                            let ts_ms = ts * 1000;
+
+                            // initialize new Date object
+                             let date_ob = new Date(ts_ms);
+
+                            // year as 4 digits (YYYY)
+                            let year = date_ob.getFullYear();
+
+                            // month as 2 digits (MM)
+                            let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+
+                            // date as 2 digits (DD)
+                            let date = ("0" + date_ob.getDate()).slice(-2);
+
+                            return (year + "-" + month + "-" + date);
+                        }
+
+                        $("#drivername").val(data.obj.drv_Name);
+                        $("#callsign").val(data.obj.call_sign);
+                        $("#pdapin").val(data.obj.pdaPin);
+                        $("#priority").val(data.obj.priority);
+                        $("#defaultvehicle").val(data.obj.DefaultVehicle);
+
+
+                        switch (data.obj.is_active)
+                        {
+                            case true:
+                                $("#active").prop('checked', true);
+                                break;
+                            case false:
+                                $("#active").prop('checked', false);
+                                break;
+                            case null:
+                                $("#active").prop('checked', false);
+                                break;
+                        }
+
+                        switch (data.obj.AllowBidRadius)
+                        {
+                            case true:
+                                 $("#allowset").prop("checked", true);
+                                break;
+                            case false:
+                                 $("#allowset").prop("checked", false);
+                                break;
+                            case null:
+                                 $("#allowset").prop("checked", false);
+                                break;
+                        }
+
+                        switch (data.obj.driverRevert)
+                        {
+                            case true:
+                                $("#allowrevert").prop('checked', true);
+                                break;
+                            case false:
+                                 $("#allowrevert").prop("checked", false);
+                                break;
+                             case null:
+                                 $("#allowrevert").prop("checked", false);
+                                break;
+                        }
+
+                        switch (data.obj.driverBid)
+                        {
+                            case true:
+                                $("#allowbidjob").prop('checked', true);
+                                break;
+                            case false:
+                                $("#allowbidjob").prop('checked', false);
+                                break;
+                            case null:
+                                $("#allowbidjob").prop('checked', false);
+                                break;
+                        }
+
+                        switch (data.obj.AllowBidGlobal)
+                        {
+                            case true:
+                                $("#allowbidglobal").prop('checked', true);
+                                break;
+                            case false:
+                                $("#allowbidglobal").prop('checked', false);
+                                break;
+                            case null:
+                                $("#allowbidglobal").prop('checked', false);
+                                break;
+                        }
+
+                        switch (data.obj.AllowFutureJob)
+                        {
+                            case true:
+                                $("#allowfuture").prop('checked', true);
+                                break;
+                            case false:
+                                $("#allowfuture").prop('checked', false);
+                                break;
+                            case null:
+                                $("#allowfuture").prop('checked', false);
+                                break;
+                        }
+
+                        switch (data.obj.lockout_drv_chk)
+                        {
+                            case true:
+                                $("#lockout").prop('checked', true);
+                                break;
+                            case false:
+                                $("#lockout").prop('checked', false);
+                                break;
+                            case null:
+                                $("#lockout").prop('checked', false);
+                                break;
+                        }
+
+
+                        // $("#active").val(data.obj.is_active);
+                        // $("#allowset").val(data.obj.AllowBidRadius);
+                        //$("#allowrevert").val(data.obj.driverRevert);
+                        //$("#allowbidjob").val(data.obj.driverBid);
+                        //$("#allowbidglobal").val(data.obj.AllowBidGlobal);
+                        //$("#allowfuture").val(data.obj.AllowFutureJob);
+                        //$("#lockout").val(data.obj.lockout_drv_chk);
+
+                        $("#street1a").val(data.obj.steet1a);
+                        $("#street1b").val(data.obj.steet1b);
+                        $("#street2").val(data.obj.steet2);
+                        $("#town").val(data.obj.town);
+                        $("#country").val(data.obj.country);
+                        $("#postcode").val(data.obj.postcode);
+                        $("#hometele").val(data.obj.home_tele_num);
+                        $("#mobiletele").val(data.obj.mob_tele_num);
+                        $("#Drivinglicence").val(data.obj.drvlic_num);
+                        $("#pco").val(data.obj.taxi_badg_num);
+
+                        let exp2 = ConvertDate(data.obj.badg_exp);
+                        $("#pcodriverlicexpires").val(exp2);
+
+                        let exp1 = ConvertDate(data.obj.lic_exp);
+                        $("#driverlicexpires").val(exp1);
+
+                        let dob1 = ConvertDate(data.obj.dob);
+                        $("#dateofbirth").val(dob1);
+                        let startdate1 = ConvertDate(data.obj.start_date);
+                        $("#startdate").val(startdate1);
+                        let enddate1 = ConvertDate(data.obj.end_date);
+                        $("#enddate").val(enddate1);
+
+
+
+                        switch (data.obj.sex_chk)
+                        {
+                            case "Male":
+                                $("#male").prop('checked', true);
+                                break;
+                            case "Female":
+                                $("#female").prop('checked', true);
+                                break;
+                             case "male":
+                                $("#male").prop('checked', true);
+                                break;
+                            case "female":
+                                $("#female").prop('checked', true);
+                                break;
+                            default:
+                                $("#male").prop('checked', false);
+                                $("#female").prop('checked', false);
+                                break;
+                        }
+
+                        //$("#Radios1").val(data.obj.sex_chk);
+
+                        $("#nationalinsurance").val(data.obj.nat_ins_num);
+                        $("#email").val(data.obj.email);
+
+                        for (let i = 0; i <= data.obj.weekdays.length; i++) {
+
+                            if (data.obj.weekdays[i] === "Monday") {
+                                $("#mon").prop('checked', true);
+                               // debugger
+                                break;
+                            }
+                            else
+                            {
+                                $("#mon").prop('checked', false);
+                               // debugger
+               
+                            }
+                        }
+
+                       for (let i = 0; i <= data.obj.weekdays.length; i++) {
+
+                            if (data.obj.weekdays[i] === "Tuesday") {
+                                $("#tue").prop('checked', true);
+                               // debugger
+                                break;
+                            }
+                            else
+                            {
+                                $("#tue").prop('checked', false);
+                               // debugger
+                       
+                            }
+                        }
+
+                       for (let i = 0; i <= data.obj.weekdays.length; i++) {
+
+                            if (data.obj.weekdays[i] === "Wednesday") {
+                                $("#wed").prop('checked', true);
+                               // debugger
+                                break;
+                            }
+                            else
+                            {
+                                $("#wed").prop('checked', false);
+                               // debugger
+                         
+                            }
+                        }
+
+                      for (let i = 0; i <= data.obj.weekdays.length; i++) {
+
+                            if (data.obj.weekdays[i] === "Thursday") {
+                                $("#thur").prop('checked', true);
+                               // debugger
+                                break;
+                            }
+                            else
+                            {
+                                $("#thur").prop('checked', false);
+                              //  debugger
+                        
+                            }
+                        }
+
+                        for (let i = 0; i <= data.obj.weekdays.length; i++) {
+
+                            if (data.obj.weekdays[i] === "Friday") {
+                                $("#fri").prop('checked', true);
+                               // debugger
+                                break;
+                            }
+                            else
+                            {
+                                $("#fri").prop('checked', false);
+                               // debugger
+              
+                            }
+                        }
+
+                        for (let i = 0; i <= data.obj.weekdays.length; i++) {
+
+                            if (data.obj.weekdays[i] === "Saturday") {
+                                $("#sat").prop('checked', true);
+                              //  debugger
+                                break;
+                            }
+                            else
+                            {
+                                $("#sat").prop('checked', false);
+                             //   debugger
+                   
+                            }
+                        }
+
+                        for (let i = 0; i <= data.obj.weekdays.length; i++) {
+
+                            if (data.obj.weekdays[i] === "Sunday") {
+                                $("#sun").prop('checked', true);
+                               // debugger
+                                break;
+                            }
+                            else
+                            {
+                                $("#sun").prop('checked', false);
+                              //  debugger
+                    
+                            }
+                        }
+
+                  
+                        //$("#mon").val(data.obj.weekdays[0]);
+                        //$("#tue").val(data.obj.weekdays[1]);
+                        //$("#wed").val(data.obj.weekdays[2]);
+                        //$("#thur").val(data.obj.weekdays[3]);
+                        //$("#fri").val(data.obj.weekdays[4]);
+                        //$("#sat").val(data.obj.weekdays[5]);
+                        //$("#sun").val(data.obj.weekdays[6]);
+
+                        let shift1 = ConvertTime(data.obj.shift_timestart);
+                        $("#startshift").val(shift1);
+                        let shift2 = ConvertTime(data.obj.shift_timeend);
+                        $("#endshift").val(shift2);
+
+
+                    }
+
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+
+
+
+
+        }
+
+        function DownloadDriverImages()
+        {
+            let obj = new Object();
+            obj.call_sign = $("#callsign").val();
+
+            debugger
+
+            if (obj.callsign == "")
+            {
+                   Swal.fire({
+                    icon: 'error',
+                    title: 'please select callsign',
+                    text: '',
+                  })
+            }
+            else
+            {
+
+                let timerInterval
+                Swal.fire({
+                    title: 'Pictures downloading',
+                    html: 'I will close in <b></b> milliseconds.',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    onBeforeOpen: () => {
+                        Swal.showLoading()
+                        timerInterval = setInterval(() => {
+                            Swal.getContent().querySelector('b')
+                                .textContent = Swal.getTimerLeft()
+                        }, 3000)
+                    },
+                    onClose: () => {
+                        clearInterval(timerInterval)
+                    }
+                }).then((result) => {
+                    if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.timer
+                    ) {
+                        console.log('I was closed by the timer') // eslint-disable-line
+                    }
+                })
+
+
+                $.ajax({
+                    url: '@Url.Action("DownloadDriverImage","Home")',
+                    type: 'POST',
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({
+                        obj1 : obj
+                    }),
+                    success: function (data) {
+                        debugger
+                        if (data.success) {
+                            debugger
+                            Swal.fire({
+                                position: 'top-end',
+                                type: 'success',
+                                title: data.message,
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                timer: 2000
+                            });
+                        }
+                        else
+                        {
+                            debugger
+                                Swal.fire({
+                                position: 'center',
+                                type: 'warning',
+                                title: data.message,
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                timer: 2000
+                            });
+                        }
+                    }
+                });
+            }
+          
+        }
+
+
+
+
+        var toggler = document.getElementsByClassName("box");
+        var i;
+
+        for (i = 0; i < toggler.length; i++) {
+            toggler[i].addEventListener("click", function () {
+                this.parentElement.querySelector(".nested").classList.toggle("active");
+                this.classList.toggle("check-box");
+            });
+        }
+    </script>
+
+</body>
+</html>

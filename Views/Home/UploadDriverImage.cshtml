@@ -1,0 +1,246 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+</head>
+<body>
+  
+    <div class="container">
+        <h4>Each file size could not be greater than 1.5 MB</h4>
+        <div class="row mt-3">
+
+
+            <div class="col-sm-6">
+                <label>Driver Snapshot: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img1" required>
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+                <label>Driver Licence Card Front: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img2">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+                <label>Driver Licence Card Back: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img3">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+                <label>Driver Licence Counterpart: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img4">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+                <label>PCO Driver Licence: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img5">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+
+                <label>Insurance Certificate: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img6">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+                <label>Vehicle Log Book: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img7">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+                <label>Vehicle PCO: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img8">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+                <label>National Insurance: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img9">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+                <label>MOT: </label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="img10">
+                    <label class="custom-file-label form-control form-control-sm" for="customFile">Choose file</label>
+                </div>
+            </div>
+
+            <div class="form-row mt-3" style="margin-left: 800px">
+                <button type="button" class="btn btn-warning btn-sm mr-2" onclick="FTP_Upload_pics()">Upload</button>
+                <button type="button" class="btn btn-warning btn-sm" onclick='window.location = "@Url.Action("Index", "Home")";'>Close</button>
+            </div>
+
+        </div>
+
+       
+
+    </div>
+
+    <script>
+
+        function FTP_Upload_pics()
+        {
+
+            
+
+            debugger
+
+            var data = new FormData();
+            var file1 = $("#img1").get(0).files;
+            var file2 = $("#img2").get(0).files;
+            var file3 = $("#img3").get(0).files;
+            var file4 = $("#img4").get(0).files;
+            var file5 = $("#img5").get(0).files;
+            var file6 = $("#img6").get(0).files;
+            var file7 = $("#img7").get(0).files;
+            var file8 = $("#img8").get(0).files;
+            var file9 = $("#img9").get(0).files;
+            var file10 = $("#img10").get(0).files;
+
+
+            if (file1.length == 0 && file2.length == 0 && file3.length == 0 && file4.length == 0 && file5.length == 0 && file6.length == 0 && file7.length == 0 && file8.length == 0 && file9.length == 0 && file10.length == 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'please choose file',
+                    text: '',
+                })
+            }
+            else
+            {
+
+  
+            debugger
+            if (file1.length > 0) {
+                data.append("HelpSectionImages1", file1[0]);
+            }
+            if (file2.length > 0) {
+                data.append("HelpSectionImages2", file2[0]);
+            }
+            if (file3.length > 0) {
+                data.append("HelpSectionImages3", file3[0]);
+            }
+            if (file4.length > 0) {
+                data.append("HelpSectionImages4", file4[0]);
+            }
+            if (file5.length > 0) {
+                data.append("HelpSectionImages5", file5[0]);
+            }
+            if (file6.length > 0) {
+                data.append("HelpSectionImages6", file6[0]);
+            }
+            if (file7.length > 0) {
+                data.append("HelpSectionImages7", file7[0]);
+            }
+            if (file8.length > 0) {
+                data.append("HelpSectionImages8", file8[0]);
+            }
+            if (file9.length > 0) {
+                data.append("HelpSectionImages9", file9[0]);
+            }
+            if (file10.length > 0) {
+                data.append("HelpSectionImages10", file10[0]);
+            }
+
+            var callsign = $('#callsigntxt').val();
+            data.append("callsign", callsign);
+
+    
+            let timerInterval
+            Swal.fire({
+              title: 'Pictures uploading',
+              html: 'I will close in <b></b> milliseconds.',
+              timer: 3000,
+              timerProgressBar: true,
+              onBeforeOpen: () => {
+                Swal.showLoading()
+                timerInterval = setInterval(() => {
+                  Swal.getContent().querySelector('b')
+                    .textContent = Swal.getTimerLeft()
+                }, 2000)
+              },
+              onClose: () => {
+                clearInterval(timerInterval)
+              }
+            }).then((result) => {
+              if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.timer
+              ) {
+                console.log('I was closed by the timer') // eslint-disable-line
+              }
+            })
+
+
+            $.ajax({
+                url: '@Url.Action("UploadDriverImage", "Home")',
+                type: "POST",
+                processData: false,
+                contentType: false, //"application/json; charset=utf-8",
+                data: data,
+                success: function (data) {
+                    if (!data.success) {
+
+
+                          Swal.fire({
+                            position: 'top-end',
+                            type: 'success',
+                            title: data.message,
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            timer: 2000
+                          });
+
+                        setTimeout(function ()
+                        {
+                           window.location.reload();
+                        },2000);
+
+                    } else {
+
+                          Swal.fire({
+                            position: 'center',
+                            type: 'warning',
+                            title: data.message,
+                            showConfirmButton: false,
+                            allowOutsideClick: false,
+                            timer: 2000
+                          });
+
+                        setTimeout(function ()
+                        {
+                           window.location.reload();
+                        },2000);
+
+                      
+                    }
+                }
+
+            });
+        }
+
+  }
+
+    </script>
+
+
+    <script>
+        // Add the following code if you want the name of the file appear on select
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+    </script>
+
+</body>
+</html>
